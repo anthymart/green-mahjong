@@ -1,4 +1,4 @@
-var matchingGame = matchingGame ||{};
+export var matchingGame = matchingGame ||{};
 
 
 matchingGame.spider= {};

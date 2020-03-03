@@ -1,4 +1,4 @@
-var points = points || {};
+export var points = points || {};
 
 points.elapsedTime = 30;
 points.gameWon = true;
@@ -7,7 +7,7 @@ points.undoUsed;
 points.hintsUsed;
 points.points;
 
-function Points(elapsedTime, gameWon, layout, undoUsed, hintsUsed, points) {
+export function Points(elapsedTime, gameWon, layout, undoUsed, hintsUsed, points) {
     this.elapsedTime = elapsedTime;
     this.gameWon = gameWon;
     this.layout = layout;
@@ -23,13 +23,13 @@ Points.prototype.saveGameStatistics = function() {
     localStorage.setItem("gameStatistics", JSON.stringify(gameStatistics));
 };
 
-function getGameStatistics() {
+export function getGameStatistics() {
     var gameStatistics = new GameStatistics(JSON.parse(localStorage.getItem("gameStatistics")));
     return gameStatistics;
 }
 ;
 
-var gameStatistics = gameStatistics || {};
+export var gameStatistics = gameStatistics || {};
 
 gameStatistics.numberOfGames = 0;
 gameStatistics.numberOfGamesWon = 0;
@@ -49,7 +49,7 @@ gameStatistics.numberOfGamesWonWithoutHints = 0;
 gameStatistics.numberOfGamesWonWithoutUndoOrHints = 0;
 gameStatistics.highScore = 0;
 
-function GameStatistics(jsonObject) {
+export function GameStatistics(jsonObject) {
     if (!jsonObject) {
         this.numberOfGames = 0;
         this.numberOfGamesWon = 0;

@@ -1,4 +1,6 @@
-var matchingGame = matchingGame || {};
+var $ = require('../lib/jquery/jquery-2.1.0.min.js');
+
+export var matchingGame = matchingGame || {};
 matchingGame.version = "2.0";
 matchingGame.layoutTurtle = "turtle";
 matchingGame.layoutFlower = "flower";
@@ -99,7 +101,7 @@ matchingGame.resolutions = {
         shiftValue: 4}
 };
 
-function registerMediaQueryListListener() {
+export function registerMediaQueryListListener() {
 
     var verybigScreenMediaQueryList = window.matchMedia("(min-width:1600px) and (min-height:1100px)");
     var bigScreenMediaQueryList = window.matchMedia("(min-width: 1130px) and (max-width:1599px) and (min-height:780px),(min-height:780px) and (max-height:1129px) and (min-width:1130px)");
@@ -163,7 +165,7 @@ function registerMediaQueryListListener() {
  * Entry point to the app. It initializes the Ubuntu SDK HTML5 theme
  * and connects events to handlers
  */
-function onDeviceReady() {
+export function onDeviceReady() {
 
 //    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
 //    }
@@ -283,11 +285,18 @@ function onDeviceReady() {
     registerMediaQueryListListener();
 }
 
-function hideGameButtons() {
+export function loadBoardData(board) {
+    matchingGame.positionX = board.positionX;
+    matchingGame.positionY = board.positionY;
+    matchingGame.shift = board.shift;
+    matchingGame.selectable = board.selectable;
+}
+
+export function hideGameButtons() {
     $("div.game-buttons").hide();
 }
 
-function redrawGame() {
+export function redrawGame() {
     matchingGame.cardWidth = matchingGame.resolution.cardWidth;
     matchingGame.cardWidthWithoutBorder = matchingGame.cardWidth - matchingGame.resolution.borderWidthRight;
 //    matchingGame.cardHeight = parseInt($(".card").css('height'));
@@ -325,7 +334,7 @@ function redrawGame() {
 
     setSpriteImageForTiles();
 }
-function startGame() {
+export function startGame() {
     $("div.game-buttons").show();
     startTimer();
     resetPoints();
@@ -333,7 +342,7 @@ function startGame() {
     matchingGame.gameEnded = false;
     matchingGame.undoUsed = false;
 
-    shuffleCards();
+    // shuffleCards();
 
     var numberOfCards = matchingGame.deck.length;
     matchingGame.cardWidth = matchingGame.resolution.cardWidth;
@@ -391,23 +400,23 @@ function startGame() {
         pattern = matchingGame.deck[index];
         $(this).addClass(pattern);
         pattern = getCardPattern(pattern);
-//        console.log("pattern: " + pattern);
+//        //console.log("pattern: " + pattern);
         $(this).attr("data-pattern", pattern);
         $(this).attr("data-position-x", positionX);
         $(this).attr("data-position-y", positionY);
         $(this).attr("data-shift", shift);
         $(this).attr("data-selectable", selectable);
-        $(this).fastClick(selectCard);
+        // $(this).fastClick(selectCard);
     });
 
-    initMatchingCards();
+    // initMatchingCards();
 
     var fourthDate = new Date();
-    console.log("time for painting position and shadow: " + (fourthDate - thirdDate));
+    //console.log("time for painting position and shadow: " + (fourthDate - thirdDate));
     setSpriteImageForTiles();
 }
 
-function initMatchingCards() {
+export function initMatchingCards() {
 
     var selectable;
     var pattern;
@@ -433,7 +442,7 @@ function initMatchingCards() {
     updateMatchingCards();
 }
 
-function getNumberOfOverlappingCards(positionX, positionY, shift) {
+export function getNumberOfOverlappingCards(positionX, positionY, shift) {
     var overlappingCards = $(".card[data-position-x=" + positionX + "][data-position-y=" + positionY + "]");
     overlappingCards = overlappingCards.filter(function () {
         return (parseInt($(this).data("shift")) > shift);
@@ -442,7 +451,7 @@ function getNumberOfOverlappingCards(positionX, positionY, shift) {
     return overlappingCards.length;
 }
 
-function getExistBlockingNeighbours(positionX, positionY, shift) {
+export function getExistBlockingNeighbours(positionX, positionY, shift) {
     var positionXOfNeighbour;
 
     var blockingNeighboursWithSamePositionY = $(".card[data-position-y=" + positionY + "][data-shift=" + shift + "]");
@@ -457,25 +466,22 @@ function getExistBlockingNeighbours(positionX, positionY, shift) {
     return false;
 }
 
-function getCardPattern(cardName) {
-
+export function getCardPattern(cardName) {
     var cardJahreszeiten = ["cardFruehling", "cardSommer", "cardHerbst", "cardWinter"];
     var cardBlumen = ["cardBambus", "cardPflaume", "cardOrchidee", "cardChrysantheme"];
-
     if (cardJahreszeiten.indexOf(cardName) >= 0) {
         return "cardJahreszeiten";
     } else if (cardBlumen.indexOf(cardName) >= 0) {
         return "cardBlumen";
     }
-
     return cardName;
 }
 
-function shuffleCards() {
+export function shuffleCards() {
     matchingGame.deck = _.shuffle(matchingGame.deck);
 }
 
-function selectCard(e) {
+export function selectCard(e) {
     e.stopPropagation();
     if (!isCardSelectable($(this))) {
         return;
@@ -493,7 +499,7 @@ function selectCard(e) {
     }
 }
 
-function isCardSelectable(selectedElement) {
+export function isCardSelectable(selectedElement) {
     var positionX = selectedElement.data("position-x");
     var positionY = selectedElement.data("position-y");
     var shift = selectedElement.data("shift");
@@ -505,21 +511,21 @@ function isCardSelectable(selectedElement) {
     return ((numberOfLeftNeighbors === 0 || numberOfRightNeighbors === 0) && numberOfHigherOverlaps === 0);
 }
 
-function getShiftValueX(zIndex) {
+export function getShiftValueX(zIndex) {
     return zIndex * matchingGame.resolution.borderWidthRight;
 }
 
-function getShiftValueY(zIndex) {
+export function getShiftValueY(zIndex) {
     return zIndex * matchingGame.resolution.borderWidthBelow;
 }
 
-function getNumberOfAboveNeighbors(positionX, positionY, zIndex) {
+export function getNumberOfAboveNeighbors(positionX, positionY, zIndex) {
     return $(".card").filter(function () {
         return (($(this).css("visibility") === "visible") && ((parseInt($(this).css("top")) + matchingGame.cardHeightWithoutBorder) === positionY) && (parseInt($(this).css("z-index")) === zIndex) && (parseInt($(this).css("left")) === positionX));
     }).length;
 }
 
-function getRightNeigbors(positionX, positionY, shift) {
+export function getRightNeigbors(positionX, positionY, shift) {
     return $(".card").filter(function () {
         return (($(this).css("visibility") === "visible")
                 && ($(this).data("position-x") - positionX === 1)
@@ -528,11 +534,11 @@ function getRightNeigbors(positionX, positionY, shift) {
     });
 }
 
-function getNumberOfRightNeighbors(positionX, positionY, shift) {
+export function getNumberOfRightNeighbors(positionX, positionY, shift) {
     return getRightNeigbors(positionX, positionY, shift).length;
 }
 
-function getLeftNeighbours(positionX, positionY, shift) {
+export function getLeftNeighbours(positionX, positionY, shift) {
     return $(".card").filter(function () {
         var isNeighbour = (($(this).css("visibility") === "visible")
                 && (($(this).data("position-x") - positionX) === -1)
@@ -542,17 +548,17 @@ function getLeftNeighbours(positionX, positionY, shift) {
     });
 }
 
-function getNumberOfLeftNeighbors(positionX, positionY, shift) {
+export function getNumberOfLeftNeighbors(positionX, positionY, shift) {
     return getLeftNeighbours(positionX, positionY, shift).length;
 }
 
-function getBeneathNeighbors(positionX, positionY, zIndex) {
+export function getBeneathNeighbors(positionX, positionY, zIndex) {
     return $(".card").filter(function () {
         return (($(this).css("visibility") === "visible") && ((parseInt($(this).css("top")) - matchingGame.cardHeightWithoutBorder) === positionY) && (parseInt($(this).css("z-index")) === zIndex) && (parseInt($(this).css("left")) === positionX));
     });
 }
 
-function getUnderlayingNeighbours(positionX, positionY, shift) {
+export function getUnderlayingNeighbours(positionX, positionY, shift) {
     return $(".card").filter(function () {
         var isUnderlayingNeighbour = (($(this).css("visibility") === "visible")
                 && (Math.abs($(this).data("position-y") - positionY) < 1)
@@ -562,7 +568,7 @@ function getUnderlayingNeighbours(positionX, positionY, shift) {
     });
 }
 
-function getNumberOfHigherOverlaps(positionX, positionY, shift) {
+export function getNumberOfHigherOverlaps(positionX, positionY, shift) {
     return $(".card").filter(function () {
         var isHigherOverlap = (($(this).css("visibility") === "visible")
                 && (Math.abs($(this).data("position-y") - positionY) < 1)
@@ -572,24 +578,24 @@ function getNumberOfHigherOverlaps(positionX, positionY, shift) {
     }).length;
 }
 
-function checkPattern() {
+export function checkPattern() {
     if (isMatchPattern()) {
         $(".card-selected").removeClass("card-selected").addClass("card-removed");
         updatePoints(true);
-        removeTookCards();
+        //removeTookCards();
     } else {
         $(".card-selected").removeClass("card-selected");
     }
 }
 
-function isMatchPattern() {
+export function isMatchPattern() {
     var cards = $(".card-selected");
     var pattern = $(cards[0]).data("pattern");
     var anotherPattern = $(cards[1]).data("pattern");
     return (pattern === anotherPattern);
 }
 
-function removeTookCards() {
+export function removeTookCards() {
     var index;
     $(".card-removed").each(function (index) {
         index = $(".card").index($(this));
@@ -613,26 +619,26 @@ function removeTookCards() {
 
     $(".card-removed").css({"visibility": "hidden"});
     $(".card-removed").removeClass("card-removed");
-    updateSelectableAndMatchingCards(removedCards);
+    //updateSelectableAndMatchingCards(removedCards);
     if (isWinningGame()) {
         showWinningMessage();
     }
 }
 
-function isWinningGame() {
+export function isWinningGame() {
     return (matchingGame.undoList.length * 2) === ($(".card").length - 2);
 }
-function removeCardsFromSelectableCards(removedCards) {
+export function removeCardsFromSelectableCards(removedCards) {
     var pattern;
     var selectableCardsByPattern;
 
     pattern = $(removedCards[0]).data("pattern");
-    console.log("pattern to remove: " + pattern);
+    //console.log("pattern to remove: " + pattern);
 
     selectableCardsByPattern = matchingGame.selectableCards[pattern];
     if (selectableCardsByPattern !== undefined) {
         selectableCardsByPattern.forEach(function (matchingCard) {
-            console.log("remove class card-matching");
+            //console.log("remove class card-matching");
             matchingCard.removeClass("card-matching");
         });
     }
@@ -640,7 +646,7 @@ function removeCardsFromSelectableCards(removedCards) {
     matchingGame.selectableCards[pattern] = selectableCardsByPattern;
 }
 
-function removeCardsFromArray(cardsToRemove, cards) {
+export function removeCardsFromArray(cardsToRemove, cards) {
     var positionXCardToRemove;
     var positionYCardToRemove;
     var shiftCardToRemove;
@@ -651,10 +657,10 @@ function removeCardsFromArray(cardsToRemove, cards) {
     var cardToRemove;
     var resultingCards = [];
     var isCardToRemove;
-    console.log("cards");
-    console.dir(cards);
-    console.log("cardsToRemove");
-    console.dir(cardsToRemove);
+    //console.log("cards");
+    //console.dir(cards);
+    //console.log("cardsToRemove");
+    //console.dir(cardsToRemove);
 
     if (cards === undefined) {
         return [];
@@ -670,7 +676,7 @@ function removeCardsFromArray(cardsToRemove, cards) {
             positionXCardToRemove = cardToRemove.data("position-x");
             positionYCardToRemove = cardToRemove.data("position-y");
             shiftCardToRemove = cardToRemove.data("shift");
-            console.log("Positionen von cardToRemove: " + positionXCardToRemove + ", " + positionYCardToRemove + ", " + shiftCardToRemove);
+            //console.log("Positionen von cardToRemove: " + positionXCardToRemove + ", " + positionYCardToRemove + ", " + shiftCardToRemove);
             if (positionXCardToRemove === positionX && positionYCardToRemove === positionY && shiftCardToRemove === shift) {
                 isCardToRemove = true;
             }
@@ -680,12 +686,12 @@ function removeCardsFromArray(cardsToRemove, cards) {
         }
     });
 
-    console.log("Ergebnis: ");
-    console.dir(resultingCards);
+    //console.log("Ergebnis: ");
+    //console.dir(resultingCards);
     return resultingCards;
 }
 
-function updateSelectableAndMatchingCards(removedCards) {
+export function updateSelectableAndMatchingCards(removedCards) {
     var neighbours;
     var leftNeighbours;
     var rightNeighbours;
@@ -724,8 +730,8 @@ function updateSelectableAndMatchingCards(removedCards) {
         pattern = $(this).data("pattern");
         selectableCardsByPattern = matchingGame.selectableCards[pattern];
         if (selectableCardsByPattern !== undefined) {
-            console.log(selectableCardsByPattern);
-            console.log("index des Objekts: " + pattern + ", boolescher Wert " + cardArrayContainsCard(selectableCardsByPattern, $(this)));
+            //console.log(selectableCardsByPattern);
+            //console.log("index des Objekts: " + pattern + ", boolescher Wert " + cardArrayContainsCard(selectableCardsByPattern, $(this)));
         }
         if (selectableCardsByPattern === undefined) {
             selectableCardsByPattern = [$(this)];
@@ -738,7 +744,7 @@ function updateSelectableAndMatchingCards(removedCards) {
     updateMatchingCards();
 }
 
-function updateMatchingCards() {
+export function updateMatchingCards() {
     var existsMatch = false;
     matchingGame.matchingCards = {};
     for (pattern in matchingGame.selectableCards) {
@@ -749,7 +755,7 @@ function updateMatchingCards() {
             selectableCardsByPattern.forEach(function (matchingCard) {
                 matchingCard.addClass("card-matching");
             });
-//            console.log("match: " + pattern);
+//            //console.log("match: " + pattern);
         }
     }
 
@@ -759,7 +765,7 @@ function updateMatchingCards() {
     }
 }
 
-function showLoseMessage() {
+export function showLoseMessage() {
     stopTimer();
     matchingGame.gameEnded = true;
     calculatePoints(false);
@@ -767,21 +773,21 @@ function showLoseMessage() {
     hideGameButtons();
     $(".pointsReached").text(matchingGame.points);
     $("div#loseMessage").show();
-    console.log("Punkte: " + matchingGame.points);
+    //console.log("Punkte: " + matchingGame.points);
 }
 
-function cardArrayContainsCard(cards, card) {
+export function cardArrayContainsCard(cards, card) {
     var positionX = card.data("position-x");
     var positionY = card.data("position-y");
     var shift = card.data("shift");
-    console.log("positionX: " + positionX + ", positionY: " + positionY + ", shift: " + shift);
+    //console.log("positionX: " + positionX + ", positionY: " + positionY + ", shift: " + shift);
     if (cards === undefined || cards.length === 0) {
         return false;
     }
 
     var containsCard = false;
     cards.forEach(function (otherCard) {
-        //console.log("Vergleichsobjekt positionX: " + otherCard.data("position-x") + ", positionY: " + otherCard.data("position-y") + ", shift: " + otherCard.data("shift"));
+        ////console.log("Vergleichsobjekt positionX: " + otherCard.data("position-x") + ", positionY: " + otherCard.data("position-y") + ", shift: " + otherCard.data("shift"));
         if (otherCard.data("position-x") === positionX && otherCard.data("position-y") === positionY && otherCard.data("shift") === shift) {
             containsCard = true;
         }
@@ -789,7 +795,7 @@ function cardArrayContainsCard(cards, card) {
     return containsCard;
 }
 
-function showWinningMessage() {
+export function showWinningMessage() {
     matchingGame.gameEnded = true;
     stopTimer();
     calculatePoints(true);
@@ -798,7 +804,7 @@ function showWinningMessage() {
     $(".pointsReached").text(matchingGame.points);
     $("div#winningMessage").show();
 }
-function startNewGame() {
+export function startNewGame() {
     $("#cards").empty();
     $("#cards").append('<div class="card"></div>');
     $("#cards").append('<div class="shadow"></div>');
@@ -807,7 +813,7 @@ function startNewGame() {
     startGame();
 }
 
-function restartGame() {
+export function restartGame() {
     hideMessages();
     var numberOfRemovedPatterns = matchingGame.undoList.length;
     for (var i = 0; i < numberOfRemovedPatterns; i++) {
@@ -815,12 +821,12 @@ function restartGame() {
     }
 }
 
-function hideMessages() {
+export function hideMessages() {
     $("div#winningMessage").hide();
     $("div#loseMessage").hide();
 }
 
-function displayMessages() {
+export function displayMessages() {
     if (isWinningGame()) {
         $("div#winningMessage").show();
     } else {
@@ -828,7 +834,7 @@ function displayMessages() {
     }
 }
 
-function changeTheme(themeid) {
+export function changeTheme(themeid) {
     if (themeid !== undefined) {
         matchingGame.theme = themeid;
     }
@@ -846,7 +852,7 @@ function changeTheme(themeid) {
     setSpriteImageForTiles();
 }
 
-function setSpriteImageForTiles() {
+export function setSpriteImageForTiles() {
 
     var resolution = "";
     if (matchingGame.resolution === matchingGame.resolutions.verysmallscreen)
@@ -860,13 +866,13 @@ function setSpriteImageForTiles() {
     $("body").attr("data-resolution", resolution);
 }
 
-function undo() {
+export function undo() {
     matchingGame.gameEnded = false;
     matchingGame.undoUsed = true;
     if (matchingGame.undoList.length >= 1) {
         var cardsToUndo = matchingGame.undoList[0];
         var pattern = (matchingGame.undoList[0]).data("pattern");
-        console.log("pattern to undo: " + pattern);
+        //console.log("pattern to undo: " + pattern);
 
         cardsToUndo.each(function (index) {
             matchingGame.selectableCards[pattern].push($(this));
@@ -881,18 +887,18 @@ function undo() {
     }
 }
 
-function showAlert(message) {
+export function showAlert(message) {
     if (cordovaUsed())
         navigator.notification.alert(message);
     else
         alert(message);
 }
 
-function cordovaUsed() {
+export function cordovaUsed() {
     return navigator.notification;
 }
 
-function startTimer() {
+export function startTimer() {
     $("#timer").text("00:00");
     if (matchingGame.timer === null) {
         matchingGame.timer = setInterval(updateTimer, "1000");
@@ -900,19 +906,19 @@ function startTimer() {
     matchingGame.elapsedSeconds = 0;
 }
 
-function stopTimer() {
+export function stopTimer() {
     clearInterval(matchingGame.timer);
     matchingGame.timer = null;
 }
 
-function resumeTimer() {
+export function resumeTimer() {
     if (matchingGame.timer === null) {
         matchingGame.timer = setInterval(updateTimer, "1000");
     }
 }
 
 
-function updateTimer() {
+export function updateTimer() {
     matchingGame.elapsedSeconds++;
     var numberOfMinutes = Math.floor(matchingGame.elapsedSeconds / 60);
     var numberOfSeconds = matchingGame.elapsedSeconds % 60;
@@ -929,29 +935,28 @@ function updateTimer() {
     $("#timer").text(timerText);
 }
 
-function updatePoints(incrementPoints) {
+export function updatePoints(incrementPoints) {
     if (incrementPoints) {
         matchingGame.points = matchingGame.points + 2;
     } else {
         matchingGame.points = matchingGame.points - 2;
     }
-
     $("#points").text(matchingGame.points);
 }
 
-function resetPoints() {
+export function resetPoints() {
     matchingGame.points = 0;
     $("#points").text(matchingGame.points);
 }
 
 
-function calculatePoints(gameWon) {
+export function calculatePoints(gameWon) {
     var bonusGameWon = 200;
     var timeLimitForBonus = 480;
     var timeBonus = 2;
     var pointsLowerBound = 400;
-    console.log("timeLimitForBonus: " + timeLimitForBonus);
-    console.log("matchingGame.elapsedSeconds: " + matchingGame.elapsedSeconds);
+    //console.log("timeLimitForBonus: " + timeLimitForBonus);
+    //console.log("matchingGame.elapsedSeconds: " + matchingGame.elapsedSeconds);
     if (gameWon) {
         matchingGame.points = matchingGame.points + bonusGameWon;
         if (matchingGame.elapsedSeconds < timeLimitForBonus) {
@@ -967,13 +972,13 @@ function calculatePoints(gameWon) {
     }
 
     var layout = $("#cards").attr("data-layout");
-    console.log("undoUsed: " + matchingGame.undoUsed + ", matchingGame.hintsUsed: " + matchingGame.hintsUsed);
+    //console.log("undoUsed: " + matchingGame.undoUsed + ", matchingGame.hintsUsed: " + matchingGame.hintsUsed);
     var points = new Points(matchingGame.elapsedSeconds, gameWon, layout, matchingGame.undoUsed, matchingGame.hintsUsed, matchingGame.points);
-    console.log("vor saveGameStatistics: " + points);
+    //console.log("vor saveGameStatistics: " + points);
     points.saveGameStatistics();
 }
 
-function initHintsUsed() {
+export function initHintsUsed() {
     if ($("body").hasClass('hint-on')) {
         matchingGame.hintsUsed = true;
     }
@@ -982,13 +987,13 @@ function initHintsUsed() {
     }
 }
 
-function updateHintsUsed() {
+export function updateHintsUsed() {
     if ($("body").hasClass('hint-on')) {
         matchingGame.hintsUsed = true;
     }
 }
 
-function showStatisticsInPauseScreen() {
+export function showStatisticsInPauseScreen() {
     var gameStatistics = getGameStatistics();
     if (!gameStatistics) {
         gameStatistics = new GameStatistics();
@@ -996,14 +1001,14 @@ function showStatisticsInPauseScreen() {
 
     $("[data-point='numberOfGamesInGamesWon']").text(gameStatistics.numberOfGames);
     $("[data-point='numberOfGamesWon']").text(gameStatistics.numberOfGamesWon);
-    console.log("gameStatistics.numberOfGamesWonWithoutUndoOrHints: " + gameStatistics.numberOfGamesWonWithoutUndoOrHints);
+    //console.log("gameStatistics.numberOfGamesWonWithoutUndoOrHints: " + gameStatistics.numberOfGamesWonWithoutUndoOrHints);
     $("[data-point='numberOfGamesWonWithUndoOrHints']").text(gameStatistics.numberOfGamesWonWithoutUndoOrHints);
     $("[data-point='numberOfGamesInGamesWithoutUndoOrHints']").text(gameStatistics.numberOfGames);
     $("[data-point='highScore']").text(gameStatistics.highScore);
 
-    console.log("if-Wert: " + (gameStatistics.layoutsWon === null || gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0));
-    console.log("gameStatistics.layoutsWon: " + gameStatistics.layoutsWon);
-    console.log("gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0: " + (gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0));
+    //console.log("if-Wert: " + (gameStatistics.layoutsWon === null || gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0));
+    //console.log("gameStatistics.layoutsWon: " + gameStatistics.layoutsWon);
+    //console.log("gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0: " + (gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0));
     if (gameStatistics.layoutsWon === null || gameStatistics.layoutsWon.indexOf(matchingGame.layoutTurtle) < 0) {
         $("[data-point='layoutTurtle']").hide();
     } else {
@@ -1040,7 +1045,7 @@ function showStatisticsInPauseScreen() {
         $("[data-point='layoutFourHills']").show();
     }
 
-    console.log("gameStatistics.shortestWinningTime: " + gameStatistics.shortestWinningTime);
+    //console.log("gameStatistics.shortestWinningTime: " + gameStatistics.shortestWinningTime);
     if (gameStatistics.shortestWinningTime === 0 || gameStatistics.shortestWinningTime > 480) {
         $("[data-point='gameWonUnder8Minutes']").hide();
     } else {
