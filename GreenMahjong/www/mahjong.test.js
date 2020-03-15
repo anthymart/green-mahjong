@@ -118,7 +118,7 @@ test('loadBoardData', () => {
 
 });
 
-test('getNumberOfLeftNeighbors', () => {
+test('getNumberOfImmediateLeftNeighbors', () => {
     var html = require('fs').readFileSync('./index.html').toString();
     document.documentElement.innerHTML = html;
     //if you check the html file, there should only be one dummy card div
@@ -131,14 +131,14 @@ test('getNumberOfLeftNeighbors', () => {
     mj.startNewGame();
     //after starting the game, it populates the DOM with all the card divs
     expect($('.card').length).toBe(144);
-    expect(mj.getNumberOfLeftNeighbors(14, 2.5, 0)).toBe(2);
-    expect(mj.getNumberOfLeftNeighbors(1, 1.5, 2)).toBe(0);
-    expect(mj.getNumberOfLeftNeighbors(6, 1.5, 0)).toBe(1);
-    expect(mj.getNumberOfLeftNeighbors(-1, 1.5, 0)).toBe(0);
-    expect(mj.getNumberOfLeftNeighbors(11.5, 6.5, 0)).toBe(1);
+    expect(mj.getNumberOfImmediateLeftNeighbors(14, 2.5, 0)).toBe(2);
+    expect(mj.getNumberOfImmediateLeftNeighbors(1, 1.5, 2)).toBe(0);
+    expect(mj.getNumberOfImmediateLeftNeighbors(6, 1.5, 0)).toBe(1);
+    expect(mj.getNumberOfImmediateLeftNeighbors(-1, 1.5, 0)).toBe(0);
+    expect(mj.getNumberOfImmediateLeftNeighbors(11.5, 6.5, 0)).toBe(1);
 });
 
-test('getNumberOfRightNeighbors', () => {
+test('getNumberOfImmediateRightNeighbors', () => {
     var html = require('fs').readFileSync('./index.html').toString();
     document.documentElement.innerHTML = html;
     //if you check the html file, there should only be one dummy card div
@@ -151,13 +151,13 @@ test('getNumberOfRightNeighbors', () => {
     mj.startNewGame();
     //after starting the game, it populates the DOM with all the card divs
     expect($('.card').length).toBe(144);
-    expect(mj.getNumberOfRightNeighbors(13.5, 2, 1)).toBe(1);
-    expect(mj.getNumberOfRightNeighbors(12.5, 0, 1)).toBe(0);
+    expect(mj.getNumberOfImmediateRightNeighbors(13.5, 2, 1)).toBe(1);
+    expect(mj.getNumberOfImmediateRightNeighbors(12.5, 0, 1)).toBe(0);
     //since there are no cards next to it at the same level, the value should be zero
-    expect(mj.getNumberOfRightNeighbors(4, 4.5, 1)).toBe(0);
+    expect(mj.getNumberOfImmediateRightNeighbors(4, 4.5, 1)).toBe(0);
     //this card has one next to it
-    expect(mj.getNumberOfRightNeighbors(4, 4.5, 0)).toBe(1);
-    expect(mj.getNumberOfRightNeighbors(4.5, 6, 1)).toBe(0);
+    expect(mj.getNumberOfImmediateRightNeighbors(4, 4.5, 0)).toBe(1);
+    expect(mj.getNumberOfImmediateRightNeighbors(4.5, 6, 1)).toBe(0);
 });
 
 test('getUnderlayingNeighbours', () => {
@@ -206,18 +206,18 @@ test('isCardSelectable', () => {
     mj.loadBoardData(sp.matchingGame.spider);
     mj.startNewGame();
     //easy function to get html element of a tile
-    var tile1 = mj.getLeftNeighbours(4, 4.5, 2);
+    var tile1 = mj.getImmediateLeftNeighbours(4, 4.5, 2);
     expect(mj.isCardSelectable(tile1)).toBeTruthy();
-    var tile2 = mj.getLeftNeighbours(4, 4.5, 1);
+    var tile2 = mj.getImmediateLeftNeighbours(4, 4.5, 1);
     expect(mj.isCardSelectable(tile2)).not.toBeTruthy();
-    var tile3 = mj.getLeftNeighbours(-1, -3, 4);
+    var tile3 = mj.getImmediateLeftNeighbours(-1, -3, 4);
     expect(mj.isCardSelectable(tile3)).toBeTruthy();
-    var tile4 = mj.getLeftNeighbours(1, 8, 6);
+    var tile4 = mj.getImmediateLeftNeighbours(1, 8, 6);
     expect(mj.isCardSelectable(tile4)).toBeTruthy();
     //tile underneath another tile should not be selectable
     var tile5 = mj.getUnderlayingNeighbours(8, 4, 2);
     expect(mj.isCardSelectable(tile5)).not.toBeTruthy();
-    var tile6 = mj.getLeftNeighbours(8.5, 5, 2);
+    var tile6 = mj.getImmediateLeftNeighbours(8.5, 5, 2);
     expect(mj.isCardSelectable(tile5)).not.toBeTruthy();
 });
 
@@ -236,10 +236,19 @@ test('changeTheme', () => {
     expect(mj.matchingGame.theme).toBe(1);
     mj.matchingGame.theme = 8;
     mj.changeTheme(-3);
-    expect(mj.matchingGame.theme).toBe(-3);
+    expect(mj.matchingGame.theme).toBe(0);
     mj.matchingGame.theme = 8;
     mj.changeTheme();
-    expect(mj.matchingGame.theme).toBe(9);
+    expect(mj.matchingGame.theme).toBe(0);
+});
+
+test('clamp', () => {
+    expect(mj.clamp(-3, 0, 4)).toBe(0);
+    expect(mj.clamp(1, 0, 4)).toBe(1);
+    expect(mj.clamp(50, 0, 4)).toBe(4);
+    expect(mj.clamp(4, 0, 4)).toBe(4);
+    expect(mj.clamp(-231, 2, 7)).toBe(2);
+
 });
 
 test('isMatchPattern', () => {

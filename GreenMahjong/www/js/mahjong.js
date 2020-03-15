@@ -144,6 +144,8 @@ export function registerMediaQueryListListener() {
         }
     });
 
+    checkAndSetResolution(matchingGame, verybigScreenMediaQueryList, bigScreenMediaQueryList, smallScreenMediaQueryList, verysmallScreenMediaQueryList);
+
 
     function checkAndSetResolution() {
         if (verybigScreenMediaQueryList.matches) {
@@ -160,7 +162,25 @@ export function registerMediaQueryListListener() {
             matchingGame.resolution = matchingGame.resolutions.verysmallscreen;
         }
     }
+    
 }
+
+export function checkAndSetResolution(matchingGame, verybigScreenMediaQueryList, bigScreenMediaQueryList, smallScreenMediaQueryList, verysmallScreenMediaQueryList) {
+    if (verybigScreenMediaQueryList.matches) {
+        matchingGame.resolution = matchingGame.resolutions.verybigscreen;
+    }
+    if (bigScreenMediaQueryList.matches) {
+        matchingGame.resolution = matchingGame.resolutions.bigscreen;
+    }
+
+    if (smallScreenMediaQueryList.matches) {
+        matchingGame.resolution = matchingGame.resolutions.smallscreen;
+    }
+    if (verysmallScreenMediaQueryList.matches) {
+        matchingGame.resolution = matchingGame.resolutions.verysmallscreen;
+    }
+}
+
 /**
  * Entry point to the app. It initializes the Ubuntu SDK HTML5 theme
  * and connects events to handlers
@@ -504,8 +524,8 @@ export function isCardSelectable(selectedElement) {
     var positionY = selectedElement.data("position-y");
     var shift = selectedElement.data("shift");
 
-    var numberOfLeftNeighbors = getNumberOfLeftNeighbors(positionX, positionY, shift);
-    var numberOfRightNeighbors = getNumberOfRightNeighbors(positionX, positionY, shift);
+    var numberOfLeftNeighbors = getNumberOfImmediateLeftNeighbors(positionX, positionY, shift);
+    var numberOfRightNeighbors = getNumberOfImmediateRightNeighbors(positionX, positionY, shift);
     var numberOfHigherOverlaps = getNumberOfHigherOverlaps(positionX, positionY, shift);
 
     return ((numberOfLeftNeighbors === 0 || numberOfRightNeighbors === 0) && numberOfHigherOverlaps === 0);
@@ -525,7 +545,7 @@ export function getNumberOfAboveNeighbors(positionX, positionY, zIndex) {
     }).length;
 }
 
-export function getRightNeigbors(positionX, positionY, shift) {
+export function getImmediateRightNeigbors(positionX, positionY, shift) {
     return $(".card").filter(function () {
         return (($(this).css("visibility") === "visible")
                 && ($(this).data("position-x") - positionX === 1)
@@ -534,11 +554,11 @@ export function getRightNeigbors(positionX, positionY, shift) {
     });
 }
 
-export function getNumberOfRightNeighbors(positionX, positionY, shift) {
-    return getRightNeigbors(positionX, positionY, shift).length;
+export function getNumberOfImmediateRightNeighbors(positionX, positionY, shift) {
+    return getImmediateRightNeigbors(positionX, positionY, shift).length;
 }
 
-export function getLeftNeighbours(positionX, positionY, shift) {
+export function getImmediateLeftNeighbours(positionX, positionY, shift) {
     return $(".card").filter(function () {
         var isNeighbour = (($(this).css("visibility") === "visible")
                 && (($(this).data("position-x") - positionX) === -1)
@@ -548,8 +568,8 @@ export function getLeftNeighbours(positionX, positionY, shift) {
     });
 }
 
-export function getNumberOfLeftNeighbors(positionX, positionY, shift) {
-    return getLeftNeighbours(positionX, positionY, shift).length;
+export function getNumberOfImmediateLeftNeighbors(positionX, positionY, shift) {
+    return getImmediateLeftNeighbours(positionX, positionY, shift).length;
 }
 
 export function getBeneathNeighbors(positionX, positionY, zIndex) {
@@ -705,8 +725,8 @@ export function updateSelectableAndMatchingCards(removedCards) {
         positionX = $(this).data("position-x");
         positionY = $(this).data("position-y");
         shift = $(this).data("shift");
-        leftNeighbours = getLeftNeighbours(positionX, positionY, shift);
-        rightNeighbours = getRightNeigbors(positionX, positionY, shift);
+        leftNeighbours = getImmediateLeftNeighbours(positionX, positionY, shift);
+        rightNeighbours = getImmediateRightNeigbors(positionX, positionY, shift);
         underlayingNeighbours = getUnderlayingNeighbours(positionX, positionY, shift);
 
         var allNeighbours = leftNeighbours.add(rightNeighbours).add(underlayingNeighbours);
@@ -834,12 +854,24 @@ export function displayMessages() {
     }
 }
 
+
+export function clamp(v, a, b) {
+    if (v < a) {
+        return a;
+    } else if (v > b) {
+        return b;
+    } else {
+        return v;
+    }
+}
+
 export function changeTheme(themeid) {
     if (themeid !== undefined) {
+        themeid = clamp(themeid, 0, matchingGame.themes.length-1);
         matchingGame.theme = themeid;
     }
     else {
-        if (matchingGame.theme === matchingGame.themes.length - 1)
+        if (matchingGame.theme >= matchingGame.themes.length - 1)
             matchingGame.theme = 0;
         else
             matchingGame.theme = matchingGame.theme + 1;
